@@ -89,8 +89,16 @@ Depending on the use case of the formality classifier, **different metrics may b
 - **Informal Precision** matters when labeling or filtering text for tone-sensitive applications, like writing assistants or educational platforms. If we incorrectly flag a formal sentence as informal, the system may offer unnecessary or misleading corrections.
 
 # Results
-We obtained quite promising results by just prompting the LLM correctly! 
+We obtained quite promising results by just prompting the LLM correctly! The figure below shows how the metrics change depending on the number of shots used in the prompt:
+![Few-shot performance](eval_results/few_shot_metrics.png)
 
-
-
-
+In the table form,
+| Shots | Accuracy | Formal F1 | Informal F1 |
+|:-----:|:--------:|:---------:|:-----------:|
+| 0     | 0.6267   | 0.4343    | 0.7214      |
+| 1     | 0.8465   | 0.8193    | 0.8667      |
+| 2     | 0.9466   | 0.9459    | 0.9473      |
+| 3     | 0.9532   | 0.9539    | 0.9525      |
+| 4     | 0.9657   | 0.9652    | 0.9662      |
+| 5     | 0.9598   | 0.9595    | 0.9602      |
+| 6     | 0.9640   | 0.9632    | 0.9647      |
