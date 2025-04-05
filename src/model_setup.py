@@ -1,3 +1,4 @@
+import unsloth
 import torch
 from transformers import AutoTokenizer
 from unsloth import FastLanguageModel
