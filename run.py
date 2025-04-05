@@ -29,6 +29,8 @@ model, _, tokenizer2 = setup_model(
 
 # Load data and evaluate
 data = pd.read_csv(DATA_PATH)
+data = data.sample(frac=1, random_state=42).reset_index(drop=True)
+
 results_df = evaluate_few_shot_batched(
     model=model,
     tokenizer2=tokenizer2,
