@@ -88,6 +88,12 @@ Depending on the use case of the formality classifier, **different metrics may b
 - **Informal Recall** is important when the system must detect all informal messages — for example, in games or chat platforms where informal language triggers a specific response or action.
 - **Informal Precision** matters when labeling or filtering text for tone-sensitive applications, like writing assistants or educational platforms. If we incorrectly flag a formal sentence as informal, the system may offer unnecessary or misleading corrections.
 
+# How to run the experiments
+Use the notebook in the notebooks/ folder:
+```notebooks/few_shot_formality_classification.ipynb```
+
+You can open and run it directly in Google Colab — it’s self-contained and easy to follow.
+
 # Results
 We obtained quite promising results by just prompting the LLM correctly! The figure below shows how the metrics change depending on the number of shots used in the prompt:
 ![Few-shot performance](eval_results/few_shot_metrics.png)
