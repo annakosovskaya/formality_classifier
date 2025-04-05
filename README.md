@@ -23,7 +23,7 @@ Informal samples were collected from:
 
 - *EmpatheticDialogues* – casual conversations meant to reflect everyday speech.
 
-All datasets were loaded via the Hugging Face Hub and then cleaned and preprocessed.
+All datasets were loaded via the Hugging Face Hub and then cleaned and preprocessed. **Note**: data isn't shuffled!
 
 ## Preprocessing
 To reduce noise, I applied the following preprocessing steps:
@@ -32,7 +32,7 @@ To reduce noise, I applied the following preprocessing steps:
 
 - Strip HTML tags;
 
-- Normalize whitespace by removing extra spaces and tabs (formal texts usually avoid such inconsistencies, but we don't want it to be a clue for classification)
+- Normalize whitespace by removing extra spaces and tabs (formal texts usually avoid such inconsistencies, but I don't want it to be a clue for classification)
 
 - Limit repeated characters, e.g.: "aaaaaaaaaaa" → "aaaa", "!!!!!!!!!!!!" → "!!!!!" It will not change the formality (formal texts still may have a maximum of three repeated characters).
 
@@ -57,17 +57,17 @@ Several common approaches for Formality Classification are:
 | **Style-transfer as classifier** | Reuse models trained to rewrite style (formal ↔ informal) for classification tasks.           |
 | **Feedback-based training**      | Improve the classifier over time using user corrections or manual feedback.                   |
 
-**We use zero-/few-shot prompting with LLMs**, specifically `LLaMA-3` (loaded via `Unsloth`).
+**I use zero-/few-shot prompting with LLMs**, specifically `LLaMA-3` (loaded via `Unsloth`).
 
-We don’t perform any kind of training or fine-tuning — the model is used as-is. In each case, we formulate a prompt that describes the task and provides between 0 and 6 labeled examples (for a few-shot). We then ask the model to classify the next text as either "formal" or "informal". 
+I don’t perform any kind of training or fine-tuning — the model is used as-is. In each case, I formulate a prompt that describes the task and provides between 0 and 6 labeled examples (for a few-shot). I then ask the model to classify the next text as either "formal" or "informal". 
 
 After generation, the model’s response is parsed using a simple heuristic:
-- If the word “formal” is present and “informal” is not — we classify it as formal
+- If the word “formal” is present and “informal” is not — I classify it as formal
 - Otherwise — the label is informal
 
 This logic can be adjusted depending on the application. For example, if it’s more important not to mistakenly label a formal text as informal, one may design the rules differently. Additional heuristics can also be applied to handle cases when both “formal” and “informal” appear in the response, or when neither label is present.
 
-To speed up processing, we implemented batched evaluation. Additionally, we provide a non-batched version for clarity and easier understanding of the logic.
+To speed up processing, I implemented batched evaluation. Additionally, I provide a non-batched version for clarity and easier understanding of the logic.
 
 ⚠️ Note:
 >All input texts are truncated to fit within model limits. In our case, this worked well since the beginning of each text typically contained enough signals to determine its formality.
@@ -88,14 +88,43 @@ Depending on the use case of the formality classifier, **different metrics may b
 - **Informal Recall** is important when the system must detect all informal messages — for example, in games or chat platforms where informal language triggers a specific response or action.
 - **Informal Precision** matters when labeling or filtering text for tone-sensitive applications, like writing assistants or educational platforms. If we incorrectly flag a formal sentence as informal, the system may offer unnecessary or misleading corrections.
 
-# How to run the experiments
+# How to Run the Project and Reproduce the Experiments
+
+## Option 1: Use the Colab Notebook (recommended)
+This is the **easiest and most transparent way** to explore and reproduce the experiments.
+
 Use the notebook in the notebooks/ folder:
 ```notebooks/few_shot_formality_classification.ipynb```
 
-You can open and run it directly in Google Colab — it’s self-contained and easy to follow.
+You can open and run it directly in Google Colab — it’s self-contained and easy to follow. The dataset is automatically loaded from the repository — no need to upload any files manually.
+
+## Option 2: Run via Terminal or Colab Cell (requires an NVIDIA GPU)
+If you prefer to run the full pipeline from a script, you can launch it directly using the following commands:
+
+```
+!git clone https://github.com/annakosovskaya/formality_classifier
+%cd formality_classifier
+!pip install -r requirements.txt
+!pip install -q unsloth tqdm
+!python run.py
+```
+
+The script-based version supports only batched evaluation.
+
+⚠️ Important:
+>`unsloth` package requires an NVIDIA GPU! In Colab, make sure to switch the runtime to GPU (Runtime → Change runtime type → GPU) before running the code.
+
+### Configuration
+You can modify settings in the ```config.py``` file to customize the experiment:
+
+- Change the model
+
+- Adjust few-shot settings (SHOT_COUNTS)
+
+- Update dataset path or batch size
 
 # Results
-We obtained quite promising results by just prompting the LLM correctly! The figure below shows how the metrics change depending on the number of shots used in the prompt:
+I obtained quite promising results by just prompting the LLM correctly! The figure below shows how the metrics change depending on the number of shots used in the prompt:
 ![Few-shot performance](eval_results/few_shot_metrics.png)
 
 In the table form,
@@ -109,7 +138,7 @@ In the table form,
 | 5     | 0.9598   | 0.9595    | 0.9602      |
 | 6     | 0.9640   | 0.9632    | 0.9647      |
 
-My realization (using ```unsloth/llama-3-8b-bnb-4bit```, ```batch_size=14```, on a dataset of 1200 examples) required the following processing time:
+The following experiment run (using ```unsloth/llama-3-8b-bnb-4bit```, ```batch_size=14```, on a dataset of 1200 examples) required the following processing time:
 | Number of Shots | Execution Time |
 |------------------|----------------|
 | 0                | 06:19          |
