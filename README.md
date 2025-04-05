@@ -10,25 +10,25 @@ To ensure a fair evaluation, I decided to create my own custom dataset, rather t
 I constructed a binary classification dataset for formality detection, combining data from six different sources:
 
 Formal samples were collected from:
-- CNN/DailyMail – news articles;
+- *CNN/DailyMail* – news articles;
 
-- XSum – official summaries of news;
+- *XSum* – official summaries of news;
 
-- EURLEX – legal documents from the European Union.
+- *EURLEX* – legal documents from the European Union.
 
 Informal samples were collected from:
-- TweetEval – tweets;
+- *TweetEval* – tweets;
 
-- Reddit – discussions and posts;
+- *Reddit* – discussions and posts;
 
-- EmpatheticDialogues – casual conversations meant to reflect everyday speech.
+- *EmpatheticDialogues* – casual conversations meant to reflect everyday speech.
 
 All datasets were loaded via the Hugging Face Hub and then cleaned and preprocessed.
 
 ## Preprocessing
 To reduce noise, I applied the following preprocessing steps:
 
-- Remove HTML artifacts (e.g. \&nbsp;, \<br>, etc.);
+- Remove HTML artifacts (e.g. `&nbsp;`, `<br>`, etc.);
 
 - Strip HTML tags;
 
@@ -57,7 +57,7 @@ Several common approaches for Formality Classification are:
 | **Style-transfer as classifier** | Reuse models trained to rewrite style (formal ↔ informal) for classification tasks.           |
 | **Feedback-based training**      | Improve the classifier over time using user corrections or manual feedback.                   |
 
-**We use zero-/few-shot prompting with LLMs**, specifically LLaMA-3 (loaded via Unsloth).
+**We use zero-/few-shot prompting with LLMs**, specifically `LLaMA-3` (loaded via `Unsloth`).
 
 We don’t perform any kind of training or fine-tuning — the model is used as-is. In each case, we formulate a prompt that describes the task and provides between 0 and 6 labeled examples (for a few-shot). We then ask the model to classify the next text as either "formal" or "informal". 
 
@@ -78,8 +78,8 @@ To speed up processing, we implemented batched evaluation. Additionally, we prov
 The dataset is balanced and there is no task specificity, so I report and plot **Accuracy** and **F1-score**. In addition, I also calculate **Precision** and **Recall** for each class.
 
 For clarity, I refer to:
-- **"Formal Recall"** (Precision, F-1 score) as the standard Recall (Precision, F-1 score) when the positive class is `"formal"`,
-- **"Informal Recall"** (Precision, F-1 score) as the standard Recall (Precision, F-1 score) when the positive class is `"informal"`.
+- **"Formal Recall"** (Precision, F-1 score) as the standard Recall (Precision, F-1 score) when the positive class is "formal",
+- **"Informal Recall"** (Precision, F-1 score) as the standard Recall (Precision, F-1 score) when the positive class is "informal".
 
 Depending on the use case of the formality classifier, **different metrics may be more important**. For instance,
 
@@ -102,3 +102,18 @@ In the table form,
 | 4     | 0.9657   | 0.9652    | 0.9662      |
 | 5     | 0.9598   | 0.9595    | 0.9602      |
 | 6     | 0.9640   | 0.9632    | 0.9647      |
+
+My realization (using ```unsloth/llama-3-8b-bnb-4bit```, ```batch_size=14```, on a dataset of 1200 examples) required the following processing time:
+| Number of Shots | Execution Time |
+|------------------|----------------|
+| 0                | 06:19          |
+| 1                | 06:59          |
+| 2                | 07:46          |
+| 3                | 08:12          |
+| 4                | 09:17          |
+| 5                | 10:12          |
+| 6                | 11:04          |
+
+As we can see, even providing the model with just a single example significantly improves the metrics compared to giving none, while only slightly increasing the processing time. A performance plateau is observed at around 4 examples — this seems to be the most efficient point in terms of both metric gains and execution time.
+
+
