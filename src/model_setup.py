@@ -1,6 +1,12 @@
 import torch
 from transformers import AutoTokenizer
 from unsloth import FastLanguageModel
+from unsloth import tokenizer_utils
+
+# needed as this function doesn't like it when the lm_head has its size changed
+def do_nothing(*args, **kwargs):
+    pass
+tokenizer_utils.fix_untrained_tokens = do_nothing
 
 def setup_model(
     model_name: str = "unsloth/llama-3-8b-bnb-4bit",
