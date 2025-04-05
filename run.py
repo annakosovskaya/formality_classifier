@@ -1,3 +1,10 @@
+import os
+import warnings
+
+# Suppress warnings
+warnings.filterwarnings('ignore')
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
+
 import pandas as pd
 from src.model_setup import setup_model
 from src.evaluate import evaluate_few_shot_batched
